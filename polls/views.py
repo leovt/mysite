@@ -16,26 +16,22 @@ class IndexView(generic.ListView):
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
-class DetailView(generic.DetailView):
+class QuestionView(generic.DetailView):
     model = Question
+
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
+
+
+class DetailView(QuestionView):
     template_name = 'polls/detail.html'
 
-    def get_queryset(self):
-        """
-        Excludes any questions that aren't published yet.
-        """
-        return Question.objects.filter(pub_date__lte=timezone.now())
 
-
-class ResultsView(generic.DetailView):
-    model = Question
+class ResultsView(QuestionView):
     template_name = 'polls/results.html'
-
-    def get_queryset(self):
-        """
-        Excludes any questions that aren't published yet.
-        """
-        return Question.objects.filter(pub_date__lte=timezone.now())
 
 
 def vote(request, question_id):
